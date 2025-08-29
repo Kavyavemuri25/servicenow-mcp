@@ -23,8 +23,8 @@ T = TypeVar('T', bound=BaseModel)
 class ListWorkflowsParams(BaseModel):
     """Parameters for listing workflows."""
     
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     name: Optional[str] = Field(None, description="Filter by name (contains)")
     query: Optional[str] = Field(None, description="Additional query string")
@@ -34,15 +34,15 @@ class GetWorkflowDetailsParams(BaseModel):
     """Parameters for getting workflow details."""
     
     workflow_id: str = Field(..., description="Workflow ID or sys_id")
-    include_versions: Optional[bool] = Field(False, description="Include workflow versions")
+    include_versions: Optional[bool] = Field(None, description="Include workflow versions (default: false)")
 
 
 class ListWorkflowVersionsParams(BaseModel):
     """Parameters for listing workflow versions."""
     
     workflow_id: str = Field(..., description="Workflow ID or sys_id")
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
 
 
 class GetWorkflowActivitiesParams(BaseModel):
@@ -58,7 +58,7 @@ class CreateWorkflowParams(BaseModel):
     name: str = Field(..., description="Name of the workflow")
     description: Optional[str] = Field(None, description="Description of the workflow")
     table: Optional[str] = Field(None, description="Table the workflow applies to")
-    active: Optional[bool] = Field(True, description="Whether the workflow is active")
+    active: Optional[bool] = Field(None, description="Whether the workflow is active (default: true)")
     attributes: Optional[Dict[str, Any]] = Field(None, description="Additional attributes for the workflow")
 
 

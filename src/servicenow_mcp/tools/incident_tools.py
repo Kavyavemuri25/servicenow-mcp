@@ -55,7 +55,7 @@ class AddCommentParams(BaseModel):
 
     incident_id: str = Field(..., description="Incident ID or sys_id")
     comment: str = Field(..., description="Comment to add to the incident")
-    is_work_note: bool = Field(False, description="Whether the comment is a work note")
+    is_work_note: bool = Field(None, description="Whether the comment is a work note (default: false)")
 
 
 class ResolveIncidentParams(BaseModel):
@@ -69,8 +69,8 @@ class ResolveIncidentParams(BaseModel):
 class ListIncidentsParams(BaseModel):
     """Parameters for listing incidents."""
 
-    limit: int = Field(10, description="Maximum number of incidents to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of incidents to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     state: Optional[str] = Field(None, description="Filter by incident state")
     assigned_to: Optional[str] = Field(None, description="Filter by assigned user")
     category: Optional[str] = Field(None, description="Filter by category")

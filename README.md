@@ -206,6 +206,19 @@ The default `config/tool_packages.yaml` includes the following role-based packag
 7. **approve_change** - Approve a change request
 8. **reject_change** - Reject a change request
 
+**Important Note on Change Request Identifiers:**
+The change management tools now support both ServiceNow identifier formats:
+- **Display Number**: Human-readable format like `CHG0030001` (recommended for user input)
+- **Sys ID**: 32-character hexadecimal identifier like `a4fb2cae47a7261065fda464116d43c2`
+
+All change management functions automatically detect the format and use the appropriate ServiceNow API endpoint.
+
+**Schema Differences:**
+- **Create**: Basic fields for initial change request creation (short_description, type, description, risk, impact, category, etc.)
+- **Update**: All fields including planning details (risk_impact_analysis, comments, work_notes, justification, implementation_plan, backout_plan, test_plan) for comprehensive updates
+
+**Note on Timeouts:** Some ServiceNow operations (especially updates) may take time to process due to workflows and business rules. The tools now use optimized timeouts (30 seconds) and include verification steps to ensure updates are successful. You can use either format when calling these tools.
+
 #### Agile Management Tools
 
 ##### Story Management

@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 class ListScriptIncludesParams(BaseModel):
     """Parameters for listing script includes."""
     
-    limit: int = Field(10, description="Maximum number of script includes to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of script includes to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     client_callable: Optional[bool] = Field(None, description="Filter by client callable status")
     query: Optional[str] = Field(None, description="Search query for script includes")
@@ -39,9 +39,9 @@ class CreateScriptIncludeParams(BaseModel):
     script: str = Field(..., description="Script content")
     description: Optional[str] = Field(None, description="Description of the script include")
     api_name: Optional[str] = Field(None, description="API name of the script include")
-    client_callable: bool = Field(False, description="Whether the script include is client callable")
-    active: bool = Field(True, description="Whether the script include is active")
-    access: str = Field("package_private", description="Access level of the script include")
+    client_callable: bool = Field(None, description="Whether the script include is client callable (default: false)")
+    active: bool = Field(None, description="Whether the script include is active (default: true)")
+    access: str = Field(None, description="Access level of the script include (default: package_private)")
 
 
 class UpdateScriptIncludeParams(BaseModel):

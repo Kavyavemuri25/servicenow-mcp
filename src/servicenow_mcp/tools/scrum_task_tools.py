@@ -54,8 +54,8 @@ class UpdateScrumTaskParams(BaseModel):
 class ListScrumTasksParams(BaseModel):
     """Parameters for listing scrum tasks."""
 
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
     state: Optional[str] = Field(None, description="Filter by state")
     assignment_group: Optional[str] = Field(None, description="Filter by assignment group")
     timeframe: Optional[str] = Field(None, description="Filter by timeframe (upcoming, in-progress, completed)")

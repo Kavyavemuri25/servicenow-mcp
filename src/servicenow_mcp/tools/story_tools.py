@@ -27,7 +27,7 @@ class CreateStoryParams(BaseModel):
     description: Optional[str] = Field(None, description="Detailed description of the story")
     state: Optional[str] = Field(None, description="State of story (-6 is Draft,-7 is Ready for Testing,-8 is Testing,1 is Ready, 2 is Work in progress, 3 is Complete, 4 is Cancelled)")
     assignment_group: Optional[str] = Field(None, description="Group assigned to the story")
-    story_points: Optional[int] = Field(10, description="Points value for the story")
+    story_points: Optional[int] = Field(None, description="Points value for the story (default: 10)")
     assigned_to: Optional[str] = Field(None, description="User assigned to the story")
     epic: Optional[str] = Field(None, description="Epic that the story belongs to. It requires the System ID of the epic.")
     project: Optional[str] = Field(None, description="Project that the story belongs to. It requires the System ID of the project.")
@@ -51,8 +51,8 @@ class UpdateStoryParams(BaseModel):
 class ListStoriesParams(BaseModel):
     """Parameters for listing stories."""
 
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
     state: Optional[str] = Field(None, description="Filter by state")
     assignment_group: Optional[str] = Field(None, description="Filter by assignment group")
     timeframe: Optional[str] = Field(None, description="Filter by timeframe (upcoming, in-progress, completed)")
@@ -61,8 +61,8 @@ class ListStoriesParams(BaseModel):
 class ListStoryDependenciesParams(BaseModel):
     """Parameters for listing story dependencies."""
 
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
     query: Optional[str] = Field(None, description="Additional query string")
     dependent_story: Optional[str] = Field(None, description="Sys_id of the dependent story is required")
     prerequisite_story: Optional[str] = Field(None, description="Sys_id that this story depends on is required")

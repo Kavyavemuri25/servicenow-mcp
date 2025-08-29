@@ -23,7 +23,7 @@ class CreateCatalogItemVariableParams(BaseModel):
     name: str = Field(..., description="The name of the variable (internal name)")
     type: str = Field(..., description="The type of variable (e.g., string, integer, boolean, reference)")
     label: str = Field(..., description="The display label for the variable")
-    mandatory: bool = Field(False, description="Whether the variable is required")
+    mandatory: bool = Field(None, description="Whether the variable is required (default: false)")
     help_text: Optional[str] = Field(None, description="Help text to display with the variable")
     default_value: Optional[str] = Field(None, description="Default value for the variable")
     description: Optional[str] = Field(None, description="Description of the variable")
@@ -48,7 +48,7 @@ class ListCatalogItemVariablesParams(BaseModel):
     """Parameters for listing catalog item variables."""
 
     catalog_item_id: str = Field(..., description="The sys_id of the catalog item")
-    include_details: bool = Field(True, description="Whether to include detailed information about each variable")
+    include_details: bool = Field(None, description="Whether to include detailed information about each variable (default: true)")
     limit: Optional[int] = Field(None, description="Maximum number of variables to return")
     offset: Optional[int] = Field(None, description="Offset for pagination")
 
@@ -58,8 +58,8 @@ class ListCatalogItemVariablesResponse(BaseModel):
 
     success: bool = Field(..., description="Whether the operation was successful")
     message: str = Field(..., description="Message describing the result")
-    variables: List[Dict[str, Any]] = Field([], description="List of variables")
-    count: int = Field(0, description="Total number of variables found")
+    variables: List[Dict[str, Any]] = Field(None, description="List of variables (default: empty list)")
+    count: int = Field(None, description="Total number of variables found (default: 0)")
 
 
 class UpdateCatalogItemVariableParams(BaseModel):

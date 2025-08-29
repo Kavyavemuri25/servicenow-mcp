@@ -22,8 +22,8 @@ T = TypeVar('T', bound=BaseModel)
 class ListChangesetsParams(BaseModel):
     """Parameters for listing changesets."""
 
-    limit: Optional[int] = Field(10, description="Maximum number of records to return")
-    offset: Optional[int] = Field(0, description="Offset to start from")
+    limit: Optional[int] = Field(None, description="Maximum number of records to return (default: 10)")
+    offset: Optional[int] = Field(None, description="Offset to start from (default: 0)")
     state: Optional[str] = Field(None, description="Filter by state")
     application: Optional[str] = Field(None, description="Filter by application")
     developer: Optional[str] = Field(None, description="Filter by developer")

@@ -31,7 +31,7 @@ class CreateUserParams(BaseModel):
     mobile_phone: Optional[str] = Field(None, description="Mobile phone number of the user")
     location: Optional[str] = Field(None, description="Location of the user")
     password: Optional[str] = Field(None, description="Password for the user account")
-    active: Optional[bool] = Field(True, description="Whether the user account is active")
+    active: Optional[bool] = Field(None, description="Whether the user account is active (default: true)")
 
 
 class UpdateUserParams(BaseModel):
@@ -64,8 +64,8 @@ class GetUserParams(BaseModel):
 class ListUsersParams(BaseModel):
     """Parameters for listing users."""
 
-    limit: int = Field(10, description="Maximum number of users to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of users to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     department: Optional[str] = Field(None, description="Filter by department")
     query: Optional[str] = Field(
@@ -86,7 +86,7 @@ class CreateGroupParams(BaseModel):
     members: Optional[List[str]] = Field(
         None, description="List of user sys_ids or usernames to add as members"
     )
-    active: Optional[bool] = Field(True, description="Whether the group is active")
+    active: Optional[bool] = Field(None, description="Whether the group is active (default: true)")
 
 
 class UpdateGroupParams(BaseModel):
@@ -123,8 +123,8 @@ class RemoveGroupMembersParams(BaseModel):
 class ListGroupsParams(BaseModel):
     """Parameters for listing groups."""
 
-    limit: int = Field(10, description="Maximum number of groups to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of groups to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     query: Optional[str] = Field(
         None,

@@ -19,11 +19,11 @@ logger = logging.getLogger(__name__)
 class ListCatalogItemsParams(BaseModel):
     """Parameters for listing service catalog items."""
     
-    limit: int = Field(10, description="Maximum number of catalog items to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of catalog items to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     category: Optional[str] = Field(None, description="Filter by category")
     query: Optional[str] = Field(None, description="Search query for catalog items")
-    active: bool = Field(True, description="Whether to only return active catalog items")
+    active: bool = Field(None, description="Whether to only return active catalog items (default: true)")
 
 
 class GetCatalogItemParams(BaseModel):
@@ -35,10 +35,10 @@ class GetCatalogItemParams(BaseModel):
 class ListCatalogCategoriesParams(BaseModel):
     """Parameters for listing service catalog categories."""
     
-    limit: int = Field(10, description="Maximum number of categories to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of categories to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     query: Optional[str] = Field(None, description="Search query for categories")
-    active: bool = Field(True, description="Whether to only return active categories")
+    active: bool = Field(None, description="Whether to only return active categories (default: true)")
 
 
 class CatalogResponse(BaseModel):
@@ -56,7 +56,7 @@ class CreateCatalogCategoryParams(BaseModel):
     description: Optional[str] = Field(None, description="Description of the category")
     parent: Optional[str] = Field(None, description="Parent category sys_id")
     icon: Optional[str] = Field(None, description="Icon for the category")
-    active: bool = Field(True, description="Whether the category is active")
+    active: bool = Field(None, description="Whether the category is active (default: true)")
     order: Optional[int] = Field(None, description="Order of the category")
 
 
@@ -100,17 +100,22 @@ def list_catalog_items(
     # Build the API URL
     url = f"{config.instance_url}/api/now/table/sc_cat_item"
     
+    # Set default values
+    limit = params.limit if params.limit is not None else 10
+    offset = params.offset if params.offset is not None else 0
+    active = params.active if params.active is not None else True
+    
     # Prepare query parameters
     query_params = {
-        "sysparm_limit": params.limit,
-        "sysparm_offset": params.offset,
+        "sysparm_limit": limit,
+        "sysparm_offset": offset,
         "sysparm_display_value": "true",
         "sysparm_exclude_reference_link": "true",
     }
     
     # Add filters
     filters = []
-    if params.active:
+    if active:
         filters.append("active=true")
     if params.category:
         filters.append(f"category={params.category}")
@@ -151,8 +156,8 @@ def list_catalog_items(
             "message": f"Retrieved {len(formatted_items)} catalog items",
             "items": formatted_items,
             "total": len(formatted_items),
-            "limit": params.limit,
-            "offset": params.offset,
+            "limit": limit,
+            "offset": offset,
         }
     
     except requests.exceptions.RequestException as e:
@@ -162,8 +167,8 @@ def list_catalog_items(
             "message": f"Error listing catalog items: {str(e)}",
             "items": [],
             "total": 0,
-            "limit": params.limit,
-            "offset": params.offset,
+            "limit": limit,
+            "offset": offset,
         }
 
 

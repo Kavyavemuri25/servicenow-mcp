@@ -23,15 +23,15 @@ class CreateKnowledgeBaseParams(BaseModel):
     description: Optional[str] = Field(None, description="Description of the knowledge base")
     owner: Optional[str] = Field(None, description="The specified admin user or group")
     managers: Optional[str] = Field(None, description="Users who can manage this knowledge base")
-    publish_workflow: Optional[str] = Field("Knowledge - Instant Publish", description="Publication workflow")
-    retire_workflow: Optional[str] = Field("Knowledge - Instant Retire", description="Retirement workflow")
+    publish_workflow: Optional[str] = Field(None, description="Publication workflow (default: Knowledge - Instant Publish)")
+    retire_workflow: Optional[str] = Field(None, description="Retirement workflow (default: Knowledge - Instant Retire)")
 
 
 class ListKnowledgeBasesParams(BaseModel):
     """Parameters for listing knowledge bases."""
     
-    limit: int = Field(10, description="Maximum number of knowledge bases to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of knowledge bases to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     query: Optional[str] = Field(None, description="Search query for knowledge bases")
 
@@ -44,7 +44,7 @@ class CreateCategoryParams(BaseModel):
     knowledge_base: str = Field(..., description="The knowledge base to create the category in")
     parent_category: Optional[str] = Field(None, description="Parent category (if creating a subcategory). Sys_id refering to the parent category or sys_id of the parent table.")
     parent_table: Optional[str] = Field(None, description="Parent table (if creating a subcategory). Sys_id refering to the table where the parent category is defined.")
-    active: bool = Field(True, description="Whether the category is active")
+    active: bool = Field(None, description="Whether the category is active (default: true)")
 
 
 class CreateArticleParams(BaseModel):
@@ -56,7 +56,7 @@ class CreateArticleParams(BaseModel):
     knowledge_base: str = Field(..., description="The knowledge base to create the article in")
     category: str = Field(..., description="Category for the article")
     keywords: Optional[str] = Field(None, description="Keywords for search")
-    article_type: Optional[str] = Field("html", description="The type of article. Options are 'text' or 'wiki'. text lets the text field support html formatting. wiki lets the text field support wiki markup.")
+    article_type: Optional[str] = Field(None, description="The type of article. Options are 'text' or 'wiki'. text lets the text field support html formatting. wiki markup. (default: html)")
 
 
 class UpdateArticleParams(BaseModel):
@@ -74,15 +74,15 @@ class PublishArticleParams(BaseModel):
     """Parameters for publishing a knowledge article."""
 
     article_id: str = Field(..., description="ID of the article to publish")
-    workflow_state: Optional[str] = Field("published", description="The workflow state to set")
+    workflow_state: Optional[str] = Field(None, description="The workflow state to set (default: published)")
     workflow_version: Optional[str] = Field(None, description="The workflow version to use")
 
 
 class ListArticlesParams(BaseModel):
     """Parameters for listing knowledge articles."""
     
-    limit: int = Field(10, description="Maximum number of articles to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of articles to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     knowledge_base: Optional[str] = Field(None, description="Filter by knowledge base")
     category: Optional[str] = Field(None, description="Filter by category")
     query: Optional[str] = Field(None, description="Search query for articles")
@@ -128,8 +128,8 @@ class ListCategoriesParams(BaseModel):
     
     knowledge_base: Optional[str] = Field(None, description="Filter by knowledge base ID")
     parent_category: Optional[str] = Field(None, description="Filter by parent category ID")
-    limit: int = Field(10, description="Maximum number of categories to return")
-    offset: int = Field(0, description="Offset for pagination")
+    limit: int = Field(None, description="Maximum number of categories to return (default: 10)")
+    offset: int = Field(None, description="Offset for pagination (default: 0)")
     active: Optional[bool] = Field(None, description="Filter by active status")
     query: Optional[str] = Field(None, description="Search query for categories")
 
@@ -213,10 +213,14 @@ def list_knowledge_bases(
     """
     api_url = f"{config.api_url}/table/kb_knowledge_base"
 
+    # Set default values
+    limit = params.limit if params.limit is not None else 10
+    offset = params.offset if params.offset is not None else 0
+    
     # Build query parameters
     query_params = {
-        "sysparm_limit": params.limit,
-        "sysparm_offset": params.offset,
+        "sysparm_limit": limit,
+        "sysparm_offset": offset,
         "sysparm_display_value": "true",
     }
 
@@ -253,8 +257,8 @@ def list_knowledge_bases(
                 "message": "Unexpected response format",
                 "knowledge_bases": [],
                 "count": 0,
-                "limit": params.limit,
-                "offset": params.offset,
+                "limit": limit,
+                "offset": offset,
             }
 
         # Transform the results - create a simpler structure
@@ -306,8 +310,8 @@ def list_knowledge_bases(
             "message": f"Found {len(knowledge_bases)} knowledge bases",
             "knowledge_bases": knowledge_bases,
             "count": len(knowledge_bases),
-            "limit": params.limit,
-            "offset": params.offset,
+            "limit": limit,
+            "offset": offset,
         }
 
     except requests.RequestException as e:
@@ -317,8 +321,8 @@ def list_knowledge_bases(
             "message": f"Failed to list knowledge bases: {str(e)}",
             "knowledge_bases": [],
             "count": 0,
-            "limit": params.limit,
-            "offset": params.offset,
+            "limit": limit,
+            "offset": offset,
         }
 
 
