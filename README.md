@@ -2,7 +2,7 @@
 
 # ServiceNow MCP Server
 
-A Model Completion Protocol (MCP) server implementation for ServiceNow, allowing Claude to interact with ServiceNow instances.
+A Model Completion Protocol (MCP) server implementation for ServiceNow, allowing Claude to interact with ServiceNow instances. **Now fully compatible with Google Vertex AI and ADK agents!**
 
 <a href="https://glama.ai/mcp/servers/@osomai/servicenow-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@osomai/servicenow-mcp/badge" alt="ServiceNow Server MCP server" />
@@ -10,7 +10,7 @@ A Model Completion Protocol (MCP) server implementation for ServiceNow, allowing
 
 ## Overview
 
-This project implements an MCP server that enables Claude to connect to ServiceNow instances, retrieve data, and perform actions through the ServiceNow API. It serves as a bridge between Claude and ServiceNow, allowing for seamless integration.
+This project implements an MCP server that enables Claude to connect to ServiceNow instances, retrieve data, and perform actions through the ServiceNow API. It serves as a bridge between Claude and ServiceNow, allowing for seamless integration. **Recent updates include comprehensive change management fields, Google Vertex AI compatibility, and ADK agent integration support.**
 
 ## Features
 
@@ -20,8 +20,31 @@ This project implements an MCP server that enables Claude to connect to ServiceN
 - Execute ServiceNow scripts and workflows
 - Access and query the ServiceNow Service Catalog
 - Analyze and optimize the ServiceNow Service Catalog
+- **Enhanced Change Management with comprehensive planning fields**
+- **Full Google Vertex AI compatibility for function calling**
+- **ADK agent integration support**
 - Debug mode for troubleshooting
 - Support for both stdio and Server-Sent Events (SSE) communication
+
+## Recent Updates (Latest Release)
+
+### ✅ **Google Vertex AI & ADK Compatibility**
+- **Fixed all schema validation errors** that prevented ADK agent integration
+- **Resolved `any_of` constraint conflicts** across all tool schemas
+- **Full compatibility** with Google Vertex AI function calling requirements
+- **Seamless integration** with ADK (Agent Development Kit) agents
+
+### ✅ **Enhanced Change Management Tools**
+- **New Planning Fields**: `risk_impact_analysis`, `comments`, `work_notes`, `justification`, `implementation_plan`, `backout_plan`, `test_plan`
+- **Smart Identifier Support**: Works with both `sys_id` (32-char hex) and `display_number` (CHG0030001)
+- **Schema Differentiation**: Separate schemas for create (basic) vs update (comprehensive)
+- **Optimized Timeouts**: Reduced from 120s to 30s for better performance
+
+### ✅ **Schema Improvements**
+- **Removed default values** from Pydantic Field() definitions
+- **Eliminated `any_of` constraints** that caused validation errors
+- **Maintained backward compatibility** while fixing schema issues
+- **Better error handling** and verification steps
 
 ## Installation
 
@@ -127,6 +150,42 @@ app = create_starlette_app(servicenow_mcp, debug=True)
 uvicorn.run(app, host="0.0.0.0", port=8080)
 ```
 
+## ADK Agent Integration
+
+### **Google Vertex AI Compatibility**
+The ServiceNow MCP server is now **fully compatible** with Google Vertex AI function calling and ADK agents. All schema validation errors have been resolved.
+
+### **Integration Steps**
+1. **Start the MCP Server**: Ensure your ServiceNow MCP server is running
+2. **Pass the Tool Object**: Use the actual MCP server object, not string names
+3. **Agent Configuration**: Add the MCP server to your agent's tools list
+
+### **Example ADK Integration**
+```python
+from adk import LlmAgent
+from servicenow_mcp.server import ServiceNowMCPServer
+
+# Create ServiceNow MCP server instance
+servicenow_tool = ServiceNowMCPServer(
+    host="localhost",
+    port=8000,
+    # ... other config
+)
+
+# Create agent with ServiceNow tools
+agent = LlmAgent(
+    name="ServiceNowAgent",
+    model=your_model,
+    tools=[servicenow_tool],  # Pass the actual tool object
+    # ... other config
+)
+```
+
+### **Important Notes**
+- **Don't use string names**: Pass the actual MCP server object to `tools=[servicenow_tool]`
+- **All tools loaded**: MCP loads the entire toolset, so all schemas must be valid
+- **Schema validation**: All tools now pass Google Vertex AI validation requirements
+
 ## Tool Packaging (Optional)
 
 To manage the number of tools exposed to the language model (especially in environments with limits), the ServiceNow MCP server supports loading subsets of tools called "packages". This is controlled via the `MCP_TOOL_PACKAGE` environment variable.
@@ -211,13 +270,39 @@ The change management tools now support both ServiceNow identifier formats:
 - **Display Number**: Human-readable format like `CHG0030001` (recommended for user input)
 - **Sys ID**: 32-character hexadecimal identifier like `a4fb2cae47a7261065fda464116d43c2`
 
-All change management functions automatically detect the format and use the appropriate ServiceNow API endpoint.
+All change management functions automatically detect the identifier format and use the appropriate ServiceNow API endpoint.
+
+**Enhanced Change Request Fields:**
+The change management tools now include comprehensive planning and documentation fields:
+
+**Create Change Request (Basic Fields):**
+- `short_description` - Short description of the change request
+- `description` - Detailed description of the change request
+- `type` - Type of change (normal, standard, emergency)
+- `risk` - Risk level of the change
+- `impact` - Impact of the change
+- `category` - Category of the change
+- `requested_by` - User who requested the change
+- `assignment_group` - Group assigned to the change
+- `start_date` - Planned start date (YYYY-MM-DD HH:MM:SS)
+- `end_date` - Planned end date (YYYY-MM-DD HH:MM:SS)
+
+**Update Change Request (Comprehensive Fields):**
+- All basic fields from create
+- **`risk_impact_analysis`** - Risk and impact analysis for the change
+- **`comments`** - Public comments visible to customers
+- **`work_notes`** - Internal work notes visible only to staff
+- **`justification`** - Justification for the change
+- **`implementation_plan`** - Implementation plan for the change
+- **`backout_plan`** - Backout plan for the change
+- **`test_plan`** - Test plan for the change
 
 **Schema Differences:**
-- **Create**: Basic fields for initial change request creation (short_description, type, description, risk, impact, category, etc.)
-- **Update**: All fields including planning details (risk_impact_analysis, comments, work_notes, justification, implementation_plan, backout_plan, test_plan) for comprehensive updates
+- **Create**: Basic fields for initial change request creation
+- **Update**: All fields including planning details for comprehensive updates
+- **Better UX**: Create is simple, update is comprehensive
 
-**Note on Timeouts:** Some ServiceNow operations (especially updates) may take time to process due to workflows and business rules. The tools now use optimized timeouts (30 seconds) and include verification steps to ensure updates are successful. You can use either format when calling these tools.
+**Note on Timeouts:** ServiceNow operations now use optimized 30-second timeouts and include verification steps to ensure updates are successful. You can use either identifier format when calling these tools.
 
 #### Agile Management Tools
 
@@ -388,6 +473,8 @@ Below are some example natural language queries you can use with Claude to inter
 - "List all changes assigned to the Network team"
 - "Create a normal change request to upgrade the production database server."
 - "Update change CHG0012345, set the state to 'Implement'."
+- **"Update change CHG0030001 with risk analysis: 'Low risk, scheduled maintenance window, rollback plan available' and add comment: 'Security patches will be applied during maintenance window'."**
+- **"Add work notes to change CHG0030001: 'Pre-implementation testing completed successfully' and update the implementation plan with detailed steps."**
 
 #### Agile Management Examples
 - "Create a new user story for implementing a new reporting dashboard"
@@ -525,6 +612,23 @@ Additional documentation is available in the `docs` directory:
 4. **Error: `Cannot find get_headers method in either auth_manager or server_config`**
    - This error occurs when the parameters are passed in the wrong order or when using objects that don't have the required methods.
    - Solution: Make sure you're passing the `auth_manager` and `server_config` parameters in the correct order. The functions have been updated to handle parameter swapping automatically.
+
+#### ADK Agent Integration Issues
+
+1. **Error: `400 INVALID_ARGUMENT` with `any_of` constraints**
+   - **Cause**: This was a schema validation issue that has been resolved in the latest release.
+   - **Solution**: Update to the latest version. All tools now pass Google Vertex AI validation.
+
+2. **Error: `ConnectError: All connection attempts failed`**
+   - **Cause**: ADK agent can't connect to the MCP server.
+   - **Solution**: 
+     - Ensure the ServiceNow MCP server is running
+     - Check host/port configuration in your agent
+     - Verify network connectivity
+
+3. **Error: `Input should be an instance of BaseTool`**
+   - **Cause**: Passing string names instead of actual tool objects.
+   - **Solution**: Pass the actual MCP server object: `tools=[servicenow_tool]`
 
 ### Contributing
 
